@@ -94,4 +94,100 @@ spell/
 # =========================
 *.bak
 *.retry
+# =========================
+# OS
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
 
+# =========================
+# Logs
+# =========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Node.js
+# =========================
+node_modules/
+dist/
+build/
+coverage/
+.npm
+.pnpm-store
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
+
+# =========================
+# Go
+# =========================
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+*.pid
+
+# =========================
+# Terraform
+# =========================
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.tmp
+
+# =========================
+# Neovim
+# =========================
+.nvim/
+.nvimrc.lua
+.Session.vim
+shada/
+spell/
+
+# =========================
+# Test & Cache
+# =========================
+.cache/
+.tmp/
+.temp/
+
+# =========================
+# Misc
+# =========================
+*.bak
+*.retry
+.dev-checklist.md

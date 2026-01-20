@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: go-figure-db
+    environment:
+      POSTGRES_USER: gofigure
+      POSTGRES_PASSWORD: gofigure
+      POSTGRES_DB: go-figure-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgressql/postgres_data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
