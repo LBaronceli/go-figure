@@ -1,10 +1,12 @@
 # Go Figure
 
-A production-oriented, open-source **cash-flow and expense management engine** built to demonstrate backend, frontend, and infrastructure engineering practices.
+A production-oriented, open-source **finance, cashflow, and tax engine** built to demonstrate backend, frontend, and infrastructure engineering practices.
 
 This project focuses on **ledger correctness, concurrency, asynchronous processing, and deployability**. UI polish will come on a second phase.
 
 The goal of this project is to be sort off a **Xero** light, focussed on a sole-trader and small operations for personal use, dodging the need for the compliance bloat that would come with that type of software.
+
+GST and tax returns calculation will come on Phase 2.
 
 ---
 
@@ -12,27 +14,26 @@ The goal of this project is to be sort off a **Xero** light, focussed on a sole-
 
 This project exists to demonstrate:
 
-* Backend engineering in **Go**
+- Backend engineering in **Go**
+  - Concurrency and worker pools
+  - Idempotent APIs
+  - Background job processing
+  - Clear domain modeling
 
-  * Concurrency and worker pools
-  * Idempotent APIs
-  * Background job processing
-  * Clear domain modeling
-* Frontend development in **React**
+- Frontend development in **React**
+  - Data-heavy UI
+  - Real-world async workflows
 
-  * Data-heavy UI
-  * Real-world async workflows
-* Database design
+- Database design
+  - Transactional integrity
+  - Double-entry ledger modeling
+  - Migrations and constraints
 
-  * Transactional integrity
-  * Double-entry ledger modeling
-  * Migrations and constraints
-* Infrastructure & operations
-
-  * Docker-first development
-  * Kubernetes / Cloud Run-friendly architecture
-  * Separation of API and background workers
-  * Observability hooks (metrics, logs)
+- Infrastructure & operations
+  - Docker-first development
+  - Kubernetes / Cloud Run-friendly architecture
+  - Separation of API and background workers
+  - Observability hooks (metrics, logs)
 
 This is **not** intended to be a full accounting product.
 
@@ -60,9 +61,9 @@ This is **not** intended to be a full accounting product.
                                └─────────────┘
 ```
 
-* **API** handles request/response workflows and validation
-* **Workers** handle long-running or CPU-intensive tasks
-* **Postgres** is the source of truth for both domain data and job coordination
+- **API** handles request/response workflows and validation
+- **Workers** handle long-running or CPU-intensive tasks
+- **Postgres** is the source of truth for both domain data and job coordination
 
 ---
 
@@ -70,37 +71,37 @@ This is **not** intended to be a full accounting product.
 
 ### Accounts & Ledger
 
-* Multiple accounts (cash, credit, savings)
-* Double-entry ledger model
-* Strong consistency guarantees on balances
+- Multiple accounts (cash, credit, savings)
+- Double-entry ledger model
+- Strong consistency guarantees on balances
 
 ### Transactions
 
-* Manual entry
-* CSV import (bank export style)
-* Deduplication and idempotency
-* Pending vs cleared transactions
+- Manual entry
+- CSV import (bank export style)
+- Deduplication and idempotency
+- Pending vs cleared transactions
 
 ### Categorisation & Rules
 
-* Rule-based categorisation engine
-* Reprocessing on rule changes
+- Rule-based categorisation engine
+- Reprocessing on rule changes
 
 ### Budgets & Cash-Flow
 
-* Monthly category budgets
-* Rolling cash-flow projections
-* Trend analysis
+- Monthly category budgets
+- Rolling cash-flow projections
+- Trend analysis
 
 ### Background Jobs
 
 Handled asynchronously by workers:
 
-* CSV imports
-* Transaction reconciliation
-* Categorisation reprocessing
-* Cash-flow projections
-* Scheduled rollups
+- CSV imports
+- Transaction reconciliation
+- Categorisation reprocessing
+- Cash-flow projections
+- Scheduled rollups
 
 ---
 
@@ -108,25 +109,25 @@ Handled asynchronously by workers:
 
 ### Backend
 
-* **Go**
-* HTTP API (chi)
-* PostgreSQL
-* Postgres-backed job queue (`FOR UPDATE SKIP LOCKED`)
-* OpenAPI (planned)
+- **Go**
+- HTTP API (chi)
+- PostgreSQL
+- Postgres-backed job queue (`FOR UPDATE SKIP LOCKED`)
+- OpenAPI (planned)
 
 ### Frontend
 
-* **React**
-* Vite
-* TypeScript
-* Charts and data-heavy views
+- **React**
+- Vite
+- TypeScript
+- Charts and data-heavy views
 
 ### Infrastructure
 
-* Docker & Docker Compose
-* Kubernetes (Kustomize or Helm)
-* Cloud Run compatible (stateless API + worker)
-* Postgres as the only required external dependency
+- Docker & Docker Compose
+- Kubernetes (Kustomize or Helm)
+- Cloud Run compatible (stateless API + worker)
+- Postgres as the only required external dependency
 
 ---
 
@@ -135,9 +136,10 @@ Handled asynchronously by workers:
 ```
 .
 ├── apps/
-│   ├── api/        # Go HTTP API
-│   ├── worker/     # Go background workers
-│   └── web/        # React frontend
+│  ├── backend
+│     ├── cmd/        # Go HTTP API and background workers
+│     └── internal/
+│  └── web/           # React frontend
 ├── db/
 │   ├── migrations/
 │   └── seed/
@@ -156,17 +158,17 @@ Background jobs are coordinated using **Postgres**, not a separate message broke
 
 Why:
 
-* Fewer moving parts
-* Strong durability guarantees
-* Easy local development
-* Demonstrates locking, leasing, retries, and backoff
+- Fewer moving parts
+- Strong durability guarantees
+- Easy local development
+- Demonstrates locking, leasing, retries, and backoff
 
 Key concepts:
 
-* Jobs are leased using `SELECT ... FOR UPDATE SKIP LOCKED`
-* Workers renew leases while processing
-* Automatic retries with exponential backoff
-* Dead-lettering after max attempts
+- Jobs are leased using `SELECT ... FOR UPDATE SKIP LOCKED`
+- Workers renew leases while processing
+- Automatic retries with exponential backoff
+- Dead-lettering after max attempts
 
 ---
 
@@ -174,8 +176,8 @@ Key concepts:
 
 ### Prerequisites
 
-* Docker
-* Docker Compose
+- Docker
+- Docker Compose
 
 ### Start everything
 
@@ -185,20 +187,20 @@ docker compose up --build
 
 This will start:
 
-* API
-* Worker
-* Web UI
-* Postgres
+- API
+- Worker
+- Web UI
+- Postgres
 
 ---
 
 ## Development Philosophy
 
-* **Correctness over cleverness**
-* **Explicit over magical**
-* **Operational realism**
-* **Small, composable services**
-* **Clear failure modes**
+- **Correctness over cleverness**
+- **Explicit over magical**
+- **Operational realism**
+- **Small, composable services**
+- **Clear failure modes**
 
 If a design decision trades simplicity for realism, realism usually wins.
 
@@ -206,11 +208,11 @@ If a design decision trades simplicity for realism, realism usually wins.
 
 ## Non-Goals
 
-* Real bank integrations
-* Tax/VAT/GST filing
-* Payroll
-* Regulatory compliance
-* Payment processing
+- Real bank integrations
+- Tax/VAT/GST filing
+- Payroll
+- Regulatory compliance
+- Payment processing
 
 Those are intentionally out of scope.
 
@@ -218,18 +220,17 @@ Those are intentionally out of scope.
 
 ## Roadmap (Indicative)
 
-* [ ] Core ledger and transaction model
-* [ ] CSV import + reconciliation
-* [ ] Background worker framework
-* [ ] Budgeting and projections
-* [ ] Web UI dashboards
-* [ ] OpenAPI spec + client generation
-* [ ] Metrics and tracing
-* [ ] Cloud Run deployment example
+- [ ] Core ledger and transaction model
+- [ ] CSV import + reconciliation
+- [ ] Background worker framework
+- [ ] Budgeting and projections
+- [ ] Web UI dashboards
+- [ ] OpenAPI spec + client generation
+- [ ] Metrics and tracing
+- [ ] Cloud Run deployment example
 
 ---
 
 ## License
 
 MIT
-
