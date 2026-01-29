@@ -115,6 +115,8 @@ func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+//TODO: add update handler
+
 // Helpers
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
