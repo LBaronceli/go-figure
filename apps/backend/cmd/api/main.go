@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-
 	"github.com/LBaronceli/go-figure/internal/db"
 	"github.com/LBaronceli/go-figure/internal/httpserver"
 )
@@ -22,13 +19,9 @@ func main() {
 	}
 	defer pool.Close()
 
-	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	srv := httpserver.NewServer(pool)
 
-	httpserver.RegisterRoutes(r, pool)
+	handler := srv.Routes()
 
 	addr := ":8080"
 	if v := os.Getenv("HTTP_ADDR"); v != "" {
@@ -36,6 +29,6 @@ func main() {
 	}
 
 	log.Printf("api listening on %s", addr)
-	log.Fatal(http.ListenAndServe(addr, r))
+	log.Fatal(http.ListenAndServe(addr, handler))
 }
 

@@ -84,7 +84,7 @@ func (q *Queries) GetAccount(ctx context.Context, id pgtype.UUID) (Account, erro
 	return i, err
 }
 
-const listACcounts = `-- name: ListACcounts :many
+const listAccounts = `-- name: ListAccounts :many
 SELECT 
   id,
   name,
@@ -96,8 +96,8 @@ FROM accounts
 ORDER BY created_at DESC
 `
 
-func (q *Queries) ListACcounts(ctx context.Context) ([]Account, error) {
-	rows, err := q.db.Query(ctx, listACcounts)
+func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
+	rows, err := q.db.Query(ctx, listAccounts)
 	if err != nil {
 		return nil, err
 	}

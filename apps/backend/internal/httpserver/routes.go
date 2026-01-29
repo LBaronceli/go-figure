@@ -1,11 +1,33 @@
 package httpserver
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-func RegisterRoutes(r chi.Router, db *pgxpool.Pool) {
-	r.Get("/healthz", healthz)
-	r.Get("/readyz", readyz(db))
+func (s *Server) Routes() http.Handler {
+	r := chi.NewRouter()
+
+	// middleware
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	// health
+	r.Get("/healthz", s.healthz)
+	r.Get("/readyz", s.readyz)
+
+	// accounts
+	r.Route("/accounts", func(r chi.Router) {
+		r.Post("/", s.createAccount)
+		r.Get("/", s.listAccounts)
+		r.Get("/{id}", s.getAccount)
+		r.Delete("/{id}", s.deleteAccount)
+	})
+
+	return r
 }
+

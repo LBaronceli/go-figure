@@ -25,7 +25,7 @@ SELECT
 FROM accounts
 WHERE id = $1;
 
--- name: ListACcounts :many
+-- name: ListAccounts :many
 SELECT 
   id,
   name,
