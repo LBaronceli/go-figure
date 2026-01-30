@@ -209,7 +209,7 @@ If a design decision trades simplicity for realism, realism usually wins.
 ## Non-Goals
 
 - Real bank integrations
-- Tax/VAT/GST filing
+- Tax/VAT/GST filing (on v1)
 - Payroll
 - Regulatory compliance
 - Payment processing
