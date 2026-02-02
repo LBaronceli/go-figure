@@ -25,6 +25,7 @@ func (s *Server) Routes() http.Handler {
 		r.Post("/", s.createAccount)
 		r.Get("/", s.listAccounts)
 		r.Get("/{id}", s.getAccount)
+		r.Put("/{id}", s.updateAccount)
 		r.Delete("/{id}", s.deleteAccount)
 	})
 

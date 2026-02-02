@@ -39,9 +39,8 @@ ORDER BY created_at DESC;
 -- name: UpdateAccount :one
 UPDATE accounts
 SET
-    name = $2,
-    type = $3,
-    currency = $4
+    name = COALESCE(sqlc.narg('name'), name),
+    type = COALESCE(sqlc.narg('type'), type)
 WHERE id = $1
 RETURNING
     id,

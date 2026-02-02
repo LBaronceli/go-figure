@@ -158,9 +158,8 @@ func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
 const updateAccount = `-- name: UpdateAccount :one
 UPDATE accounts
 SET
-    name = $2,
-    type = $3,
-    currency = $4
+    name = COALESCE($2, name),
+    type = COALESCE($3, type)
 WHERE id = $1
 RETURNING
     id,
@@ -172,19 +171,13 @@ RETURNING
 `
 
 type UpdateAccountParams struct {
-	ID       pgtype.UUID
-	Name     string
-	Type     string
-	Currency string
+	ID   pgtype.UUID
+	Name pgtype.Text
+	Type pgtype.Text
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error) {
-	row := q.db.QueryRow(ctx, updateAccount,
-		arg.ID,
-		arg.Name,
-		arg.Type,
-		arg.Currency,
-	)
+	row := q.db.QueryRow(ctx, updateAccount, arg.ID, arg.Name, arg.Type)
 	var i Account
 	err := row.Scan(
 		&i.ID,

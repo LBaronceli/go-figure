@@ -20,6 +20,11 @@ type createAccountRequest struct {
 	Currency string `json:"currency"`
 }
 
+type updateAccountRequest struct {
+	Name *string `json:"name"`
+	Type *string `json:"type"`
+}
+
 type accountResponse struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
@@ -93,6 +98,61 @@ func (s *Server) getAccount(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, toAccountResponse(acc))
 }
 
+// PUT /accounts/{id}
+func (s *Server) updateAccount(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := parseUUID(idStr)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	var req updateAccountRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	// Prepare update parameters
+	params := db.UpdateAccountParams{
+		ID: id,
+	}
+
+	// Handle partial updates
+	if req.Name != nil {
+		cleanName := strings.TrimSpace(*req.Name)
+		if cleanName != "" {
+			params.Name = pgtype.Text{String: cleanName, Valid: true}
+		}
+	}
+
+	if req.Type != nil {
+		cleanType := strings.TrimSpace(strings.ToLower(*req.Type))
+		if cleanType != "" {
+			params.Type = pgtype.Text{String: cleanType, Valid: true}
+		}
+	}
+
+	if !params.Name.Valid && !params.Type.Valid {
+		http.Error(w, "nothing to update", http.StatusBadRequest)
+		return
+	}
+
+	// check existence first
+	if _, err := s.q.GetAccount(r.Context(), id); err != nil {
+		http.Error(w, "account not found", http.StatusNotFound)
+		return
+	}
+
+	acc, err := s.q.UpdateAccount(r.Context(), params)
+	if err != nil {
+		http.Error(w, "failed to update account", http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, toAccountResponse(acc))
+}
+
 // DELETE /accounts/{id}
 func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
@@ -114,8 +174,6 @@ func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
-
-//TODO: add update handler
 
 // Helpers
 
@@ -161,4 +219,3 @@ func toAccountResponse(a db.Account) accountResponse {
 		UpdatedAt: updated,
 	}
 }
-
