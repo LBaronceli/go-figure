@@ -159,18 +159,35 @@ func (q *Queries) ListLedgerEntries(ctx context.Context, transactionID pgtype.UU
 }
 
 const listTransactions = `-- name: ListTransactions :many
-SELECT id, idempotency_key, description, source, posted_at, created_at FROM transactions
+SELECT id, idempotency_key, description, source, posted_at, created_at FROM transactions t
+WHERE 
+  ($3::uuid IS NULL OR EXISTS (
+    SELECT 1 FROM ledger_entries le 
+    WHERE le.transaction_id = t.id 
+    AND le.account_id = $3
+  ))
+  AND ($4::timestamptz IS NULL OR t.posted_at >= $4)
+  AND ($5::timestamptz IS NULL OR t.posted_at <= $5)
 ORDER BY posted_at DESC, created_at DESC
 LIMIT $1 OFFSET $2
 `
 
 type ListTransactionsParams struct {
-	Limit  int32
-	Offset int32
+	Limit     int32
+	Offset    int32
+	AccountID pgtype.UUID
+	StartDate pgtype.Timestamptz
+	EndDate   pgtype.Timestamptz
 }
 
 func (q *Queries) ListTransactions(ctx context.Context, arg ListTransactionsParams) ([]Transaction, error) {
-	rows, err := q.db.Query(ctx, listTransactions, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listTransactions,
+		arg.Limit,
+		arg.Offset,
+		arg.AccountID,
+		arg.StartDate,
+		arg.EndDate,
+	)
 	if err != nil {
 		return nil, err
 	}

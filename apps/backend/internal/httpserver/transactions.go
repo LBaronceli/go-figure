@@ -16,7 +16,7 @@ import (
 	db "github.com/LBaronceli/go-figure/internal/db/sqlc"
 )
 
-//maxStringLength exists so we can prevent someone from uploading a massive string.
+// maxStringLength exists so we can prevent someone from uploading a massive string.
 const (
 	maxLedgerEntries = 100
 	maxStringLength  = 500
@@ -234,9 +234,43 @@ func (s *Server) listTransactions(w http.ResponseWriter, r *http.Request) {
 	limit := 50
 	offset := 0
 
+	// Filters
+	var accountID pgtype.UUID
+	if v := r.URL.Query().Get("account_id"); v != "" {
+		id, err := parseUUID(v)
+		if err != nil {
+			http.Error(w, "invalid account_id", http.StatusBadRequest)
+			return
+		}
+		accountID = id
+	}
+
+	var startDate pgtype.Timestamptz
+	if v := r.URL.Query().Get("start_date"); v != "" {
+		t, err := time.Parse(time.RFC3339, v)
+		if err != nil {
+			http.Error(w, "invalid start_date (use RFC3339)", http.StatusBadRequest)
+			return
+		}
+		startDate = pgtype.Timestamptz{Time: t, Valid: true}
+	}
+
+	var endDate pgtype.Timestamptz
+	if v := r.URL.Query().Get("end_date"); v != "" {
+		t, err := time.Parse(time.RFC3339, v)
+		if err != nil {
+			http.Error(w, "invalid end_date (use RFC3339)", http.StatusBadRequest)
+			return
+		}
+		endDate = pgtype.Timestamptz{Time: t, Valid: true}
+	}
+
 	txs, err := s.q.ListTransactions(r.Context(), db.ListTransactionsParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
+		Limit:     int32(limit),
+		Offset:    int32(offset),
+		AccountID: accountID,
+		StartDate: startDate,
+		EndDate:   endDate,
 	})
 	if err != nil {
 		http.Error(w, "failed to list transactions", http.StatusInternalServerError)
