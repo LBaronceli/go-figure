@@ -55,3 +55,7 @@ RETURNING
 DELETE FROM accounts
 WHERE id = $1;
 
+-- name: GetAccountsByIDs :many
+SELECT * FROM accounts
+WHERE id = ANY($1::uuid[]);
+

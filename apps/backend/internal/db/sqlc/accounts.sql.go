@@ -84,6 +84,38 @@ func (q *Queries) GetAccount(ctx context.Context, id pgtype.UUID) (Account, erro
 	return i, err
 }
 
+const getAccountsByIDs = `-- name: GetAccountsByIDs :many
+SELECT id, name, type, currency, created_at, updated_at FROM accounts
+WHERE id = ANY($1::uuid[])
+`
+
+func (q *Queries) GetAccountsByIDs(ctx context.Context, dollar_1 []pgtype.UUID) ([]Account, error) {
+	rows, err := q.db.Query(ctx, getAccountsByIDs, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Account
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Type,
+			&i.Currency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listAccounts = `-- name: ListAccounts :many
 SELECT 
   id,

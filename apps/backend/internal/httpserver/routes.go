@@ -28,6 +28,12 @@ func (s *Server) Routes() http.Handler {
 		r.Delete("/{id}", s.deleteAccount)
 	})
 
+	// transactions
+	r.Route("/transactions", func(r chi.Router) {
+		r.Post("/", s.createTransaction)
+		r.Get("/", s.listTransactions)
+		r.Get("/{id}", s.getTransaction)
+	})
+
 	return r
 }
-
