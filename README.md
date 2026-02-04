@@ -8,6 +8,8 @@ The goal of this project is to be sort off a **Xero** light, focussed on a sole-
 
 GST and tax returns calculation will come on Phase 2.
 
+Note: This repo used AI for coding tests and boilerplate code. The structure, features, security choices, architecture, and most of the core code was "artisanally" crafted by me.
+
 ---
 
 ## Goals
